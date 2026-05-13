@@ -6,11 +6,11 @@ export default function InputScreen({ idea, setIdea, onDeploy, historyCount, onS
   return (
     <div className={styles.screen}>
       <div className={styles.inner}>
-        <div className={styles.eyebrow}>Multi-agent project planner</div>
-        <h1 className={styles.heading}>Deploy your crew.</h1>
+        <div className={styles.eyebrow}>Multi-Agent Project Planner</div>
+        <h1 className={styles.heading}>Deploy Your Crew</h1>
         <p className={styles.sub}>
-          Type an idea. Six specialist agents analyze it in sequence and produce
-          a complete project brief — strategy, spec, stack, QA, and task list.
+          Describe your idea. Six specialist agents will analyze it in sequence 
+          and produce a complete project brief — strategy, specification, stack, QA, and task breakdown.
         </p>
 
         <div className={styles.inputWrap}>
@@ -29,7 +29,7 @@ export default function InputScreen({ idea, setIdea, onDeploy, historyCount, onS
             onClick={onDeploy}
             disabled={!idea.trim()}
           >
-            Deploy crew →
+            Deploy Crew
           </button>
 
           {historyCount > 0 && (

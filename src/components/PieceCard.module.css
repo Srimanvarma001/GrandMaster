@@ -1,35 +1,58 @@
 .card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: var(--bg2);
-  transition: border-color 0.2s;
-  animation: fadeIn 0.3s ease;
+  gap: 16px;
+  background: var(--bg-card);
+  transition: all 0.3s var(--ease-out-quart);
+  animation: fadeUp 0.5s var(--ease-out-expo) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--piece-color), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .card.active {
-  border-color: var(--piece-color, var(--accent));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--piece-color, var(--accent)) 15%, transparent);
+  border-color: var(--piece-color);
+  box-shadow: 0 0 30px rgba(212, 165, 116, 0.15), 0 0 0 1px var(--piece-color);
+}
+
+.card.active::before {
+  opacity: 1;
 }
 
 .card.done {
-  border-color: var(--border-done);
+  border-color: var(--border-active);
+}
+
+.card.done::before {
+  opacity: 0.5;
+  background: var(--success);
 }
 
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 
 .symbol {
-  font-size: 26px;
+  font-size: 32px;
   line-height: 1;
-  transition: color 0.2s;
-  flex-shrink: 0;
+  transition: all 0.3s;
+  filter: drop-shadow(0 2px 8px currentColor);
 }
 
 .meta {
@@ -38,54 +61,66 @@
 }
 
 .name {
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-size: 18px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
 }
 
 .role {
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.05em;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: var(--border);
-  transition: background 0.2s;
+  background: var(--border-active);
+  transition: all 0.3s;
 }
 
 .dot.dotActive {
-  animation: pulse 1.2s infinite;
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 0 12px var(--piece-color);
 }
 
 .dot.dotDone {
-  background: var(--accent2);
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
 }
 
 .output {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.8;
-  color: var(--text2);
-  max-height: 200px;
+  color: var(--text-secondary);
+  max-height: 240px;
   overflow-y: auto;
   white-space: pre-wrap;
-  min-height: 36px;
+  min-height: 48px;
+  padding: 12px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
 }
 
 .output.idle {
-  color: var(--text3);
+  color: var(--text-dim);
+  font-style: italic;
 }
 
 .placeholder {
-  color: var(--text3);
+  color: var(--text-dim);
   font-style: italic;
 }
 
 .cursor {
   animation: blink 1s infinite;
-  color: var(--piece-color, var(--accent));
+  color: var(--piece-color);
+  font-weight: 600;
 }

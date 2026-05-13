@@ -1,61 +1,149 @@
 .wrap {
-  padding: 16px 20px 24px;
+  padding: 24px 32px 48px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  animation: fadeIn 0.3s ease;
+  gap: 20px;
+  animation: fadeIn 0.4s var(--ease-out-expo);
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
 }
 
 .ideaTag {
-  font-size: 12px;
-  color: var(--text2);
+  font-size: 14px;
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-style: italic;
+  flex: 1;
 }
 
 .copyBtn {
-  font-size: 11px;
-  padding: 5px 14px;
+  font-size: 12px;
+  padding: 10px 20px;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text2);
+  border: 1px solid var(--border-active);
+  border-radius: 8px;
+  color: var(--text-secondary);
   letter-spacing: 0.04em;
-  transition: all 0.15s;
+  font-weight: 500;
+  transition: all 0.25s var(--ease-out-quart);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .copyBtn:hover {
-  border-color: var(--border-active);
-  color: var(--text);
+  border-color: var(--accent-copper);
+  color: var(--accent-copper);
+  background: rgba(212, 165, 116, 0.05);
 }
 
 .copyBtn.copied {
-  border-color: var(--accent2);
-  color: var(--accent2);
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(90, 125, 90, 0.1);
 }
 
 .docBox {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 24px;
-  max-height: calc(100vh - 180px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 32px 40px;
+  max-height: calc(100vh - 200px);
   overflow-y: auto;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 .pre {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.9;
-  color: var(--text);
+  color: var(--text-primary);
   white-space: pre-wrap;
   margin: 0;
+}
+
+.pre h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.pre h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-copper);
+  margin: 24px 0 12px 0;
+}
+
+.pre h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 20px 0 8px 0;
+}
+
+.pre p {
+  margin: 8px 0;
+}
+
+.pre ul, .pre ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.pre li {
+  margin: 4px 0;
+}
+
+.pre strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.pre code {
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--accent-copper);
+}
+
+.pre hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 24px 0;
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    padding: 16px 16px 32px;
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .docBox {
+    padding: 20px;
+    border-radius: 12px;
+  }
 }

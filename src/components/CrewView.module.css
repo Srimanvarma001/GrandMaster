@@ -1,54 +1,80 @@
 .wrap {
-  padding: 16px 20px 24px;
+  padding: 24px 32px 48px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  animation: fadeIn 0.3s ease;
+  gap: 20px;
+  animation: fadeIn 0.4s var(--ease-out-expo);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .ideaTag {
-  font-size: 12px;
-  color: var(--text2);
-  padding: 6px 10px;
-  background: var(--bg3);
-  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  border-radius: 10px;
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  border: 1px solid var(--border-subtle);
+  font-style: italic;
 }
 
 .progressWrap {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
 }
 
 .progressInfo {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  color: var(--text3);
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
   letter-spacing: 0.04em;
 }
 
+.progressInfo span:first-child {
+  color: var(--accent-copper);
+  font-weight: 500;
+}
+
 .progressBar {
-  height: 2px;
-  background: var(--border);
-  border-radius: 2px;
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.5s ease;
+  background: linear-gradient(90deg, var(--accent-copper), var(--accent-amber));
+  border-radius: 3px;
+  transition: width 0.6s var(--ease-out-quart);
+  box-shadow: 0 0 12px var(--accent-copper);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    padding: 16px 16px 32px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
