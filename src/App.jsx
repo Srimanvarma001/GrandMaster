@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PIECES } from "./utils/pieces";
-import { streamAgent } from "./utils/deepseek";
+import { streamAgent, formatContext } from "./utils/agentRunner";
 import { loadHistory, saveHistory } from "./utils/history";
 
 import Header from "./components/Header";
@@ -18,11 +18,21 @@ export default function App() {
   const [tab, setTab] = useState("crew"); // crew | doc
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [stoppedIds, setStoppedIds] = useState(new Set());
 
   // Load history from localStorage on mount
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
+
+  const stopPiece = (pieceId) => {
+    setStoppedIds((prev) => new Set([...prev, pieceId]));
+    if (activeId === pieceId) {
+      setActiveId(null);
+    }
+  };
+
+  const isStopped = (pieceId) => stoppedIds.has(pieceId);
 
   const deploy = async () => {
     if (!idea.trim()) return;
@@ -37,12 +47,36 @@ export default function App() {
     setTab("crew");
     setFinalDoc("");
     setShowHistory(false);
+    setStoppedIds(new Set());
 
     const outputs = {};
+    const contextMap = {};
 
-    for (const piece of PIECES) {
-      // Add 1.5s gap between agents
-      await new Promise(r => setTimeout(r, 1500));
+    for (let i = 0; i < PIECES.length; i++) {
+      const piece = PIECES[i];
+      const nextPiece = PIECES[i + 1];
+
+      if (isStopped(piece.id)) {
+        setStates((prev) => ({
+          ...prev,
+          [piece.id]: { status: "stopped", output: "⚠️ Stopped by user" },
+        }));
+        continue;
+      }
+
+      if (i > 0) {
+        const isSameProvider = nextPiece && piece.provider === nextPiece.provider;
+        const delay = isSameProvider ? 5000 : 1500;
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      if (isStopped(piece.id)) {
+        setStates((prev) => ({
+          ...prev,
+          [piece.id]: { status: "stopped", output: "⚠️ Stopped by user" },
+        }));
+        continue;
+      }
 
       setActiveId(piece.id);
       setStates((prev) => ({
@@ -50,10 +84,16 @@ export default function App() {
         [piece.id]: { status: "thinking", output: "" },
       }));
 
+      let prompt = idea;
+      if (Object.keys(contextMap).length > 0) {
+        const context = formatContext(contextMap);
+        prompt = `Previous agents wrote this:\n${context}\n\nNow you are the ${piece.name} — ${piece.role}. Build upon what previous agents decided and provide your own expert contribution.`;
+      }
+
       await new Promise((resolve) => {
         streamAgent(
           piece,
-          idea,
+          prompt,
           (text) =>
             setStates((prev) => ({
               ...prev,
@@ -61,6 +101,7 @@ export default function App() {
             })),
           (finalText) => {
             outputs[piece.id] = finalText;
+            contextMap[piece.name] = finalText;
             setStates((prev) => ({
               ...prev,
               [piece.id]: { status: "done", output: finalText },
@@ -148,6 +189,8 @@ export default function App() {
           states={states}
           activeId={activeId}
           phase={phase}
+          onStopPiece={stopPiece}
+          stoppedIds={stoppedIds}
         />
       )}
 

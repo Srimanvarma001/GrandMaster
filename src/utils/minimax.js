@@ -2,11 +2,11 @@
  * Streams via local Express proxy → NVIDIA NIM API.
  * The proxy lives at server.js and runs on port 3001.
  */
-export async function streamDeepSeek(piece, idea, onChunk, onDone) {
+export async function streamMinimax(piece, idea, onChunk, onDone) {
   const endpoint = "http://localhost:3001/api/chat";
 
   const body = {
-    model: "deepseek-ai/deepseek-v4-flash",
+    model: "minimaxai/minimax-m2.7",
     max_tokens: 4000,
     stream: true,
     messages: [

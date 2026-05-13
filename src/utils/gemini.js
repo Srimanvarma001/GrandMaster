@@ -7,7 +7,7 @@
  * @param {function} onChunk  - Called with accumulated text on each chunk
  * @param {function} onDone   - Called with final text when complete
  */
-export async function streamAgent(piece, idea, onChunk, onDone) {
+export async function streamGemini(piece, idea, onChunk, onDone) {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey || apiKey === "your_gemini_api_key_here") {
@@ -32,7 +32,7 @@ export async function streamAgent(piece, idea, onChunk, onDone) {
       },
     ],
     generationConfig: {
-      maxOutputTokens: 1200,
+      maxOutputTokens: 4000,
       temperature: 0.7,
     },
   };

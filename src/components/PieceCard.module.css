@@ -85,6 +85,24 @@
   transition: all 0.3s;
 }
 
+.stopBtn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.stopBtn:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
 .dot.dotActive {
   animation: pulse 1.5s infinite;
   box-shadow: 0 0 12px var(--piece-color);

@@ -35,10 +35,7 @@ app.post("/api/chat", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    // In server.js, after the upstream fetch, add before the pipe:
-console.log("Status:", upstream.status);
-upstream.body.on('data', chunk => console.log("RAW:", chunk.toString()));
-upstream.body.pipe(res);
+    upstream.body.pipe(res);
 
    
   } catch (e) {

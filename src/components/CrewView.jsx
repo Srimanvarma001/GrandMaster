@@ -3,7 +3,7 @@ import { PIECES } from "../utils/pieces";
 import PieceCard from "./PieceCard";
 import styles from "./CrewView.module.css";
 
-export default function CrewView({ idea, states, activeId, phase }) {
+export default function CrewView({ idea, states, activeId, phase, onStopPiece, stoppedIds }) {
   const doneCount = PIECES.filter((p) => states[p.id]?.status === "done").length;
   const activePiece = PIECES.find((p) => p.id === activeId);
 
@@ -41,6 +41,9 @@ export default function CrewView({ idea, states, activeId, phase }) {
             piece={piece}
             state={states[piece.id] || { status: "idle", output: "" }}
             isActive={activeId === piece.id}
+            onStop={() => onStopPiece(piece.id)}
+            isStopped={stoppedIds.has(piece.id)}
+            canStop={phase === "running" && (activeId === piece.id || states[piece.id]?.status === "idle" || !states[piece.id]?.status)}
           />
         ))}
       </div>
