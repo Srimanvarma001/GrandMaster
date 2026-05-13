@@ -42,6 +42,21 @@
   background: var(--success);
 }
 
+.card.paused {
+  border-color: #f59e0b;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  animation: pulsePause 2s infinite;
+}
+
+@keyframes pulsePause {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+  }
+}
+
 .cardHeader {
   display: flex;
   align-items: center;

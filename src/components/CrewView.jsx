@@ -3,7 +3,7 @@ import { PIECES } from "../utils/pieces";
 import PieceCard from "./PieceCard";
 import styles from "./CrewView.module.css";
 
-export default function CrewView({ idea, states, activeId, phase, onStopPiece, stoppedIds, onRegenerate }) {
+export default function CrewView({ idea, states, activeId, phase, onStopPiece, stoppedIds, onRegenerate, isPaused, onTogglePause }) {
   const doneCount = PIECES.filter((p) => states[p.id]?.status === "done").length;
   const activePiece = PIECES.find((p) => p.id === activeId);
 
@@ -13,11 +13,11 @@ export default function CrewView({ idea, states, activeId, phase, onStopPiece, s
         <div className={styles.ideaTag}>"{idea}"</div>
       )}
 
-      {phase === "running" && (
+      {(phase === "running" || phase === "paused") && (
         <div className={styles.progressWrap}>
           <div className={styles.progressInfo}>
             <span>
-              {activePiece
+              {isPaused ? "⏸ Workflow Paused" : activePiece
                 ? `${activePiece.symbol} ${activePiece.name} thinking...`
                 : "Preparing..."}
             </span>
@@ -34,6 +34,20 @@ export default function CrewView({ idea, states, activeId, phase, onStopPiece, s
         </div>
       )}
 
+      {phase === "running" && (
+        <button onClick={onTogglePause} className={styles.pauseBtn} title="Pause Workflow">
+          ⏸ Hold
+        </button>
+      )}
+
+      {phase === "paused" && (
+        <div className={styles.pauseControls}>
+          <button onClick={onTogglePause} className={styles.resumeBtn} title="Resume Workflow">
+            ▶ Resume
+          </button>
+        </div>
+      )}
+
       <div className={styles.grid}>
         {PIECES.map((piece) => (
           <PieceCard
@@ -43,9 +57,10 @@ export default function CrewView({ idea, states, activeId, phase, onStopPiece, s
             isActive={activeId === piece.id}
             onStop={() => onStopPiece(piece.id)}
             isStopped={stoppedIds.has(piece.id)}
-            canStop={phase === "running" && (activeId === piece.id || states[piece.id]?.status === "idle" || !states[piece.id]?.status)}
+            canStop={(phase === "running" || phase === "paused") && (activeId === piece.id || states[piece.id]?.status === "idle" || !states[piece.id]?.status)}
             onRegenerate={onRegenerate}
             isRegenerating={activeId === piece.id && states[piece.id]?.status === "thinking"}
+            isPaused={isPaused && activeId === piece.id}
           />
         ))}
       </div>

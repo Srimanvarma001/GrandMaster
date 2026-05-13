@@ -10,7 +10,7 @@ import DocView from "./components/DocView";
 import HistoryPanel from "./components/HistoryPanel";
 
 export default function App() {
-  const [phase, setPhase] = useState("input"); // input | running | done
+  const [phase, setPhase] = useState("input"); // input | running | done | paused
   const [idea, setIdea] = useState("");
   const [states, setStates] = useState({});
   const [activeId, setActiveId] = useState(null);
@@ -19,6 +19,8 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [stoppedIds, setStoppedIds] = useState(new Set());
+  const [isPaused, setIsPaused] = useState(false);
+  const abortControllerRef = React.useRef(null);
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -34,10 +36,31 @@ export default function App() {
 
   const isStopped = (pieceId) => stoppedIds.has(pieceId);
 
+  const togglePause = () => {
+    if (isPaused) {
+      setIsPaused(false);
+      setPhase("running");
+    } else {
+      setIsPaused(true);
+      setPhase("paused");
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    }
+  };
+
+  const resetPause = () => {
+    setIsPaused(false);
+    setPhase("input");
+    setStoppedIds(new Set());
+  };
+
   const deploy = async () => {
     if (!idea.trim()) return;
 
-    // Initialise states
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     const init = {};
     PIECES.forEach((p) => {
       init[p.id] = { status: "idle", output: "" };
@@ -48,13 +71,28 @@ export default function App() {
     setFinalDoc("");
     setShowHistory(false);
     setStoppedIds(new Set());
+    setIsPaused(false);
 
     const outputs = {};
     const contextMap = {};
 
     for (let i = 0; i < PIECES.length; i++) {
+      if (signal.aborted) {
+        setPhase("paused");
+        return;
+      }
+
       const piece = PIECES[i];
       const nextPiece = PIECES[i + 1];
+
+      while (isPaused && !signal.aborted) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      if (signal.aborted) {
+        setPhase("paused");
+        return;
+      }
 
       if (isStopped(piece.id)) {
         setStates((prev) => ({
@@ -68,6 +106,11 @@ export default function App() {
         const isSameProvider = nextPiece && piece.provider === nextPiece.provider;
         const delay = isSameProvider ? 5000 : 1500;
         await new Promise(r => setTimeout(r, delay));
+      }
+
+      if (signal.aborted) {
+        setPhase("paused");
+        return;
       }
 
       if (isStopped(piece.id)) {
@@ -91,25 +134,33 @@ export default function App() {
       }
 
       await new Promise((resolve) => {
-        streamAgent(
-          piece,
-          prompt,
-          (text) =>
-            setStates((prev) => ({
-              ...prev,
-              [piece.id]: { status: "thinking", output: text },
-            })),
-          (finalText) => {
-            outputs[piece.id] = finalText;
-            contextMap[piece.name] = finalText;
-            setStates((prev) => ({
-              ...prev,
-              [piece.id]: { status: "done", output: finalText },
-            }));
+        const handleChunk = (text) => {
+          if (signal.aborted) return;
+          setStates((prev) => ({
+            ...prev,
+            [piece.id]: { status: "thinking", output: text },
+          }));
+        };
+        const handleDone = (finalText) => {
+          if (signal.aborted) {
             resolve();
+            return;
           }
-        );
+          outputs[piece.id] = finalText;
+          contextMap[piece.name] = finalText;
+          setStates((prev) => ({
+            ...prev,
+            [piece.id]: { status: "done", output: finalText },
+          }));
+          resolve();
+        };
+        streamAgent(piece, prompt, handleChunk, handleDone);
       });
+
+      if (signal.aborted) {
+        setPhase("paused");
+        return;
+      }
     }
 
     setActiveId(null);
@@ -151,6 +202,11 @@ export default function App() {
     setStates({});
     setActiveId(null);
     setShowHistory(false);
+    setStoppedIds(new Set());
+    setIsPaused(false);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
   };
 
   const regeneratePiece = async (pieceId, customInstructions = "") => {
@@ -236,7 +292,7 @@ export default function App() {
         />
       )}
 
-      {(phase === "running" || (phase === "done" && tab === "crew")) && (
+      {(phase === "running" || phase === "paused" || (phase === "done" && tab === "crew")) && (
         <CrewView
           idea={idea}
           states={states}
@@ -245,6 +301,8 @@ export default function App() {
           onStopPiece={stopPiece}
           stoppedIds={stoppedIds}
           onRegenerate={regeneratePiece}
+          isPaused={isPaused}
+          onTogglePause={togglePause}
         />
       )}
 

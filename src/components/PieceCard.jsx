@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import styles from "./PieceCard.module.css";
 
-export default function PieceCard({ piece, state, isActive, onStop, isStopped, canStop, onRegenerate, isRegenerating }) {
+export default function PieceCard({ piece, state, isActive, onStop, isStopped, canStop, onRegenerate, isRegenerating, isPaused }) {
   const outputRef = useRef(null);
   const isDone = state.status === "done";
   const isIdle = state.status === "idle";
@@ -15,9 +15,15 @@ export default function PieceCard({ piece, state, isActive, onStop, isStopped, c
     }
   });
 
+  const getDisplaySymbol = () => {
+    if (isPaused) return "⏸";
+    if (isStoppedState) return "⏹";
+    return piece.symbol;
+  };
+
   return (
     <div
-      className={`${styles.card} ${isActive ? styles.active : ""} ${isDone ? styles.done : ""}`}
+      className={`${styles.card} ${isActive ? styles.active : ""} ${isDone ? styles.done : ""} ${isPaused ? styles.paused : ""}`}
       style={{
         "--piece-color": piece.color,
       }}
@@ -26,10 +32,10 @@ export default function PieceCard({ piece, state, isActive, onStop, isStopped, c
         <span
           className={styles.symbol}
           style={{
-            color: isActive ? piece.color : isDone ? piece.color : isStoppedState ? "var(--text3)" : "var(--text3)",
+            color: isActive ? piece.color : isDone ? piece.color : isStoppedState || isPaused ? "var(--text3)" : "var(--text3)",
           }}
         >
-          {isStoppedState ? "⏹" : piece.symbol}
+          {getDisplaySymbol()}
         </span>
         <div className={styles.meta}>
           <div className={styles.name}>{piece.name}</div>
