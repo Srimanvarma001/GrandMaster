@@ -103,6 +103,70 @@
   border-color: var(--error);
 }
 
+.regenBtn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.regenBtn:hover {
+  background: var(--piece-color);
+  color: white;
+  border-color: var(--piece-color);
+}
+
+.regenArea {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.regenInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-size: 12px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.regenInput:focus {
+  border-color: var(--piece-color);
+}
+
+.regenInput::placeholder {
+  color: var(--text-dim);
+}
+
+.regenSubmit {
+  background: var(--piece-color);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+}
+
+.regenSubmit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.regenSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .dot.dotActive {
   animation: pulse 1.5s infinite;
   box-shadow: 0 0 12px var(--piece-color);

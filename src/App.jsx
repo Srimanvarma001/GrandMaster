@@ -87,7 +87,7 @@ export default function App() {
       let prompt = idea;
       if (Object.keys(contextMap).length > 0) {
         const context = formatContext(contextMap);
-        prompt = `Previous agents wrote this:\n${context}\n\nNow you are the ${piece.name} — ${piece.role}. Build upon what previous agents decided and provide your own expert contribution.`;
+        prompt = `Project brief: ${idea}\n\n## Previous Agents' Work\n${context}\n\n---\n\nNow you are the ${piece.name} — ${piece.role}. Build upon what previous agents decided and provide your expert contribution.`;
       }
 
       await new Promise((resolve) => {
@@ -153,6 +153,59 @@ export default function App() {
     setShowHistory(false);
   };
 
+  const regeneratePiece = async (pieceId, customInstructions = "") => {
+    const pieceIndex = PIECES.findIndex(p => p.id === pieceId);
+    if (pieceIndex === -1) return;
+
+    const piece = PIECES[pieceIndex];
+    const outputs = {};
+
+    PIECES.forEach(p => {
+      if (states[p.id]?.status === "done") {
+        outputs[p.id] = states[p.id].output;
+      }
+    });
+
+    const contextMap = {};
+    for (let i = 0; i < pieceIndex; i++) {
+      const prevPiece = PIECES[i];
+      if (outputs[prevPiece.id]) {
+        contextMap[prevPiece.name] = outputs[prevPiece.id];
+      }
+    }
+
+    setActiveId(piece.id);
+    setStates(prev => ({
+      ...prev,
+      [piece.id]: { status: "thinking", output: "" },
+    }));
+
+    let prompt = idea;
+    const context = formatContext(contextMap);
+    const instructions = customInstructions ? `\n\nAdditional instructions from user: ${customInstructions}` : "";
+    prompt = `Project brief: ${idea}\n\n## Previous Agents' Work\n${context}\n\n---\n\nNow you are the ${piece.name} — ${piece.role}. Build upon what previous agents decided and provide your expert contribution.${instructions}`;
+
+    await new Promise((resolve) => {
+      streamAgent(
+        piece,
+        prompt,
+        (text) =>
+          setStates(prev => ({
+            ...prev,
+            [piece.id]: { status: "thinking", output: text },
+          })),
+        (finalText) => {
+          setStates(prev => ({
+            ...prev,
+            [piece.id]: { status: "done", output: finalText },
+          }));
+          setActiveId(null);
+          resolve();
+        }
+      );
+    });
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Header
@@ -191,6 +244,7 @@ export default function App() {
           phase={phase}
           onStopPiece={stopPiece}
           stoppedIds={stoppedIds}
+          onRegenerate={regeneratePiece}
         />
       )}
 
